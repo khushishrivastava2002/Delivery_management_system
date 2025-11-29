@@ -3,6 +3,7 @@ import { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import api from '../utils/api';
+import { DeliveryPersonStatus } from '../types';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -11,7 +12,7 @@ interface User {
   name: string;
   email: string;
   phone: number;
-  status: 'active' | 'inactive';
+  status: DeliveryPersonStatus;
 }
 
 interface AuthContextType {
@@ -20,7 +21,7 @@ interface AuthContextType {
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
-  updateStatus: (status: 'active' | 'inactive') => Promise<void>;
+  updateStatus: (status: DeliveryPersonStatus) => Promise<void>;
   refreshUser: () => Promise<void>;
 }
 
@@ -85,7 +86,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const updateStatus = async (status: 'active' | 'inactive') => {
+  const updateStatus = async (status: DeliveryPersonStatus) => {
     try {
       const response = await api.patch('/delivery-person/status', { status });
       const updatedUser = response.data;

@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../contexts/AuthContext';
+import { DeliveryPersonStatus } from '../../types';
 import { Ionicons } from '@expo/vector-icons';
 import api from '../../utils/api';
 
@@ -60,7 +61,7 @@ export default function Profile() {
   };
 
   const handleStatusToggle = async (value: boolean) => {
-    const newStatus = value ? 'active' : 'inactive';
+    const newStatus = value ? DeliveryPersonStatus.ACTIVE : DeliveryPersonStatus.INACTIVE;
     setStatusLoading(true);
     try {
       await updateStatus(newStatus);
@@ -140,19 +141,19 @@ export default function Profile() {
           <Text style={styles.sectionTitle}>Availability Status</Text>
           <View style={[
             styles.statusBadge,
-            { backgroundColor: user?.status === 'active' ? '#D1FAE5' : '#F3F4F6' }
+            { backgroundColor: user?.status === DeliveryPersonStatus.ACTIVE ? '#D1FAE5' : '#F3F4F6' }
           ]}>
             <Text style={[
               styles.statusText,
-              { color: user?.status === 'active' ? '#059669' : '#6B7280' }
+              { color: user?.status === DeliveryPersonStatus.ACTIVE ? '#059669' : '#6B7280' }
             ]}>
-              {user?.status === 'active' ? 'On Duty' : 'Off Duty'}
+              {user?.status === DeliveryPersonStatus.ACTIVE ? 'On Duty' : 'Off Duty'}
             </Text>
           </View>
         </View>
         <View style={styles.statusToggle}>
           <Text style={styles.statusDescription}>
-            {user?.status === 'active'
+            {user?.status === DeliveryPersonStatus.ACTIVE
               ? 'You are currently receiving orders'
               : 'You are currently offline'}
           </Text>
@@ -161,10 +162,10 @@ export default function Profile() {
           ) : (
             <Switch
               trackColor={{ false: '#E5E7EB', true: '#818CF8' }}
-              thumbColor={user?.status === 'active' ? '#4F46E5' : '#f4f3f4'}
+              thumbColor={user?.status === DeliveryPersonStatus.ACTIVE ? '#4F46E5' : '#f4f3f4'}
               ios_backgroundColor="#E5E7EB"
               onValueChange={handleStatusToggle}
-              value={user?.status === 'active'}
+              value={user?.status === DeliveryPersonStatus.ACTIVE}
             />
           )}
         </View>

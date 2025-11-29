@@ -4,6 +4,7 @@ import * as TaskManager from 'expo-task-manager';
 import { Alert, Platform } from 'react-native';
 import api from '../utils/api';
 import { useAuth } from './AuthContext';
+import { DeliveryPersonStatus } from '../types';
 
 interface LocationContextType {
   isLocationEnabled: boolean;
@@ -88,7 +89,7 @@ export const LocationProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     const startTracking = async () => {
       // Only track if user is logged in, active, and location services are enabled
-      if (user?.status === 'active' && isLocationEnabled) {
+      if (user?.status === DeliveryPersonStatus.ACTIVE && isLocationEnabled) {
         try {
           console.log('Starting location tracking...');
 

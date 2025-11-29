@@ -18,6 +18,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
 import api from '../../utils/api';
 import * as ImagePicker from 'expo-image-picker';
+import { OrderStatus, DeliveryPersonStatus } from '../../types';
 
 interface Order {
   id: string;
@@ -25,7 +26,7 @@ interface Order {
   customer_phone: number;
   delivery_address: string;
   items: string[];
-  status: string;
+  status: OrderStatus;
   created_at: number;
   latitude: number;
   longitude: number;
@@ -64,7 +65,7 @@ export default function Home() {
     fetchOrders();
   };
 
-  const updateOrderStatus = async (orderId: string, newStatus: string) => {
+  const updateOrderStatus = async (orderId: string, newStatus: OrderStatus) => {
     try {
       await api.patch(`/orders/${orderId}/status?status=${newStatus}`);
       Alert.alert('Success', 'Order status updated successfully');
@@ -131,43 +132,43 @@ export default function Home() {
     setModalVisible(true);
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: OrderStatus) => {
     switch (status) {
-      case 'pending':
+      case OrderStatus.PENDING:
         return '#F59E0B';
-      case 'in_transit':
+      case OrderStatus.IN_TRANSIT:
         return '#3B82F6';
-      case 'reached':
+      case OrderStatus.REACHED:
         return '#8B5CF6';
-      case 'delivered':
+      case OrderStatus.DELIVERED:
         return '#10B981';
       default:
         return '#6B7280';
     }
   };
 
-  const getStatusIcon = (status: string) => {
+  const getStatusIcon = (status: OrderStatus) => {
     switch (status) {
-      case 'pending':
+      case OrderStatus.PENDING:
         return 'time';
-      case 'in_transit':
+      case OrderStatus.IN_TRANSIT:
         return 'bicycle';
-      case 'reached':
+      case OrderStatus.REACHED:
         return 'location';
       default:
         return 'checkmark-circle';
     }
   };
 
-  const getStatusLabel = (status: string) => {
+  const getStatusLabel = (status: OrderStatus) => {
     switch (status) {
-      case 'pending':
+      case OrderStatus.PENDING:
         return 'New Order';
-      case 'in_transit':
+      case OrderStatus.IN_TRANSIT:
         return 'In Transit';
-      case 'reached':
+      case OrderStatus.REACHED:
         return 'Reached Location';
-      case 'delivered':
+      case OrderStatus.DELIVERED:
         return 'Delivered';
       default:
         return status;
@@ -227,7 +228,7 @@ export default function Home() {
 
       <View style={styles.actionHint}>
         <Text style={styles.actionHintText}>
-          {item.status === 'reached' ? 'Tap to complete delivery' : 'Tap to update status'}
+          {item.status === OrderStatus.REACHED ? 'Tap to complete delivery' : 'Tap to update status'}
         </Text>
         <Ionicons name="chevron-forward" size={16} color="#9CA3AF" />
       </View>
@@ -247,7 +248,7 @@ export default function Home() {
     return order.status === filter;
   });
 
-  if (user?.status === 'inactive') {
+  if (user?.status === DeliveryPersonStatus.INACTIVE) {
     return (
       <View style={[styles.container, styles.centerContainer, { padding: 20 }]}>
         <Ionicons name="warning" size={64} color="#F59E0B" style={{ marginBottom: 20 }} />
@@ -271,7 +272,7 @@ export default function Home() {
 
       <View style={styles.filterContainer}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterContent}>
-          {['all', 'pending', 'in_transit', 'reached', 'delivered'].map((status) => (
+          {['all', ...Object.values(OrderStatus)].map((status) => (
             <TouchableOpacity
               key={status}
               style={[
@@ -284,7 +285,7 @@ export default function Home() {
                 styles.filterText,
                 filter === status && styles.activeFilterText
               ]}>
-                {status === 'all' ? 'All' : getStatusLabel(status)}
+                {status === 'all' ? 'All' : getStatusLabel(status as OrderStatus)}
               </Text>
             </TouchableOpacity>
           ))}
@@ -333,19 +334,19 @@ export default function Home() {
           <View style={styles.modalView}>
             <Text style={styles.modalTitle}>Update Order Status</Text>
 
-            {selectedOrder?.status === 'pending' && (
+            {selectedOrder?.status === OrderStatus.PENDING && (
               <TouchableOpacity
                 style={[styles.button, styles.buttonPrimary]}
                 onPress={() => {
                   setModalVisible(false);
-                  updateOrderStatus(selectedOrder.id, 'in_transit');
+                  updateOrderStatus(selectedOrder.id, OrderStatus.IN_TRANSIT);
                 }}
               >
                 <Text style={styles.textStyle}>Start Delivery</Text>
               </TouchableOpacity>
             )}
 
-            {selectedOrder?.status === 'reached' && (
+            {selectedOrder?.status === OrderStatus.REACHED && (
               <TouchableOpacity
                 style={[styles.button, styles.buttonSuccess]}
                 onPress={() => {
