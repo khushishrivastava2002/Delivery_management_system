@@ -1,4 +1,4 @@
-# EmergentText - Delivery Application
+# Delivery Application
 
 A comprehensive delivery management system comprising a FastAPI backend and a React Native (Expo) frontend for delivery personnel.
 
